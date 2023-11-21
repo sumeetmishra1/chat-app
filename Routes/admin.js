@@ -8,22 +8,18 @@ router.get('/',(req, res, next)=>{
         if(err){
             console.log(err)
         }
-    res.send(`<body>${data}</body><form action="/chat" method="POST"><input type="text" name="title"><button type="submit">send</button></form>`);
+    res.send(`<body>${data}</body><form action="/chat" onsubmit="document.getElementById('username').value=localStorage.getItem('username')" method="POST"><input type="text" name="title">
+    <input type="hidden" name="username" id="username">
+    <button type="submit">send</button></form>`);
     })
 });
 router.post('/chat',(req,res,next)=>{
-    const body=[];
-    req.on('data',(chunk)=>{
-        body.push(chunk);
-    });
-   return req.on('end',()=>{
-        const parsedbody = Buffer.concat(body).toString();
-        const message =parsedbody.split('=')[1];
-        fs.appendFile('chat.txt',message,(err)=>{
+   
+        fs.appendFile('chat.txt',`${req.body.username} : ${req.body.title}`,(err)=>{
             res.statusCode=302;
             res.setHeader('Location','/')
             return res.end();
         }) 
     })
-})
+
 module.exports=router;
